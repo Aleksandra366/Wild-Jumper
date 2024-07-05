@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 public class Health : MonoBehaviour
 {
-    [Header ("Health")]
+    [Header("Health")]
     [SerializeField] private float startingHealth;
     public float currentHealth { get; private set; }
     private Animator anim;
@@ -29,12 +28,12 @@ public class Health : MonoBehaviour
         anim = GetComponent<Animator>();
         spriteRend = GetComponent<SpriteRenderer>();
     }
-
     public void TakeDamage(float _damage)
     {
+        if (invulnerable) return;
         currentHealth = Mathf.Clamp(currentHealth - _damage, 0, startingHealth);
 
-        if(currentHealth > 0)
+        if (currentHealth > 0)
         {
             anim.SetTrigger("hurt");
             StartCoroutine(Invunerability());
@@ -44,7 +43,8 @@ public class Health : MonoBehaviour
         {
             if (!dead)
             {
-            foreach (Behaviour component in components)
+                //Deactivate all attached component classes
+                foreach (Behaviour component in components)
                     component.enabled = false;
 
                 anim.SetBool("grounded", true);
@@ -55,26 +55,13 @@ public class Health : MonoBehaviour
             }
         }
     }
-
     public void AddHealth(float _value)
     {
         currentHealth = Mathf.Clamp(currentHealth + _value, 0, startingHealth);
     }
-
-    public void Respawn()
+    private IEnumerator Invunerability()
     {
-        dead = false;
-        AddHealth(startingHealth);
-        anim.ResetTrigger("die");
-        anim.Play("Idle");
-        StartCoroutine(Invunerability());
-
-        foreach (Behaviour component in components)
-            component.enabled = true;
-    }
-
-    public IEnumerator Invunerability()
-    {
+        invulnerable = true;
         Physics2D.IgnoreLayerCollision(10, 11, true);
         for (int i = 0; i < numberOfFlashes; i++)
         {
@@ -84,11 +71,24 @@ public class Health : MonoBehaviour
             yield return new WaitForSeconds(iFramesDuration / (numberOfFlashes * 2));
         }
         Physics2D.IgnoreLayerCollision(10, 11, false);
-         invulnerable = false;
+        invulnerable = false;
     }
-     private void Deactivate()
+    private void Deactivate()
     {
         gameObject.SetActive(false);
     }
-}
 
+    //Respawn
+    public void Respawn()
+    {
+        AddHealth(startingHealth);
+        anim.ResetTrigger("die");
+        anim.Play("Idle");
+        StartCoroutine(Invunerability());
+        dead = false;
+
+        //Activate all attached component classes
+        foreach (Behaviour component in components)
+            component.enabled = true;
+    }
+}
