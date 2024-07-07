@@ -43,12 +43,12 @@ public class Health : MonoBehaviour
         {
             if (!dead)
             {
-                //Deactivate all attached component classes
+                anim.SetTrigger("die");
                 foreach (Behaviour component in components)
                     component.enabled = false;
 
                 anim.SetBool("grounded", true);
-                anim.SetTrigger("die");
+                
 
                 dead = true;
                 SoundManager.instance.PlaySound(deathSound);
@@ -78,7 +78,6 @@ public class Health : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    //Respawn
     public void Respawn()
     {
         AddHealth(startingHealth);
@@ -87,7 +86,6 @@ public class Health : MonoBehaviour
         StartCoroutine(Invunerability());
         dead = false;
 
-        //Activate all attached component classes
         foreach (Behaviour component in components)
             component.enabled = true;
     }
