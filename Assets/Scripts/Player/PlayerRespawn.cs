@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class PlayerRespawn : MonoBehaviour
 {
-   
+
     [SerializeField] private AudioClip checkpoint;
-    
+
     private Transform currentCheckpoint;
     private Health playerHealth;
     private UIManager uiManager;
@@ -18,16 +18,16 @@ public class PlayerRespawn : MonoBehaviour
 
     public void CheckRespawn()
     {
-        if (currentCheckpoint == null) 
+        if (currentCheckpoint == null)
         {
             uiManager.GameOver();
-            
+
             return;
         }
 
         transform.position = currentCheckpoint.position;
         playerHealth.Respawn();
-       
+
         Camera.main.GetComponent<CameraController>().MoveToNewRoom(currentCheckpoint.parent);
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -37,7 +37,7 @@ public class PlayerRespawn : MonoBehaviour
             currentCheckpoint = collision.transform;
             SoundManager.instance.PlaySound(checkpoint);
             collision.GetComponent<Collider2D>().enabled = false;
-            collision.GetComponent<Animator>().SetTrigger("activate");
+            collision.GetComponent<Animator>().SetTrigger("appear");
         }
     }
 }
